@@ -2,8 +2,8 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 class KarlBoost:
-    def __init__(self, n_estimators=50):
-        self.n_estimators = n_estimators
+    def __init__(self, T=50):
+        self.T = T
         self.estimators = []
         self.estimator_weights = []
 
@@ -11,7 +11,7 @@ class KarlBoost:
         n_samples = X.shape[0]
         weights = np.full(n_samples, 1 / n_samples)
 
-        for _ in range(self.n_estimators):
+        for t in range(self.T):
             clf = DecisionTreeClassifier(max_depth=1)
             clf.fit(X, y, sample_weight=weights)
             predictions = clf.predict(X)
