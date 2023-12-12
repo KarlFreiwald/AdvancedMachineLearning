@@ -12,19 +12,20 @@ class KarlBoost:
         weights = np.full(n_samples, 1 / n_samples)
 
         for t in range(self.T):
-            clf = DecisionTreeClassifier(max_depth=1)
-            clf.fit(X, y, sample_weight=weights)
-            predictions = clf.predict(X)
+            base_learner_t = DecisionTreeClassifier(max_depth=1)
+            base_learner_t.fit(X, y, sample_weight=weights)
+            predictions = base_learner_t.predict(X)
 
             misclassified = predictions != y
+            # "/ weights.sum()" actually not necessary as =1
             error = np.dot(weights, misclassified) / weights.sum()
-            alpha = np.log((1 - error) / error) / 2
+            alpha_t = np.log((1 - error) / error) / 2
 
-            weights *= np.exp(alpha * misclassified * ((weights > 0) | (alpha < 0)))
+            weights *= np.exp(alpha_t * misclassified * ((weights > 0) | (alpha_t < 0)))
             weights /= weights.sum()
 
-            self.estimators.append(clf)
-            self.estimator_weights.append(alpha)
+            self.estimators.append(base_learner_t)
+            self.estimator_weights.append(alpha_t)
 
     def predict(self, X):
         clf_predictions = np.array([clf.predict(X) for clf in self.estimators])
